@@ -1,10 +1,13 @@
-// This one recieves uncommented code
+// This function recieves uncommented code and lexes it. Returns js:array
 let lexer = (code) => {
-    var codeLength = code.length, store = '', doubleQuoteFlag = false, singleQuoteFlag = false, tokenStream = [];
+    var codeLength = code.length /* stores the code length for faster runtime.*/, store = ''/* stores characters and acts as a buffer */, doubleQuoteFlag = false, singleQuoteFlag = false /* Boolean flags to check if the present character is inside a string */, tokenStream = [];// Array to store the tokens
+    // List containing all seperators
     var opFirstChars = ['=','+','-','*','/','%','&','|','!','~','>','<',';',':',',','[',']','{','}','==','===','!=','!==','++','--','<<','>>','<=>','<=','>=','(',')','><'];
+    // for loop running through the whole "code string"
     for (i = 0; i < codeLength; i++) {
-        if (singleQuoteFlag||doubleQuoteFlag) {
-            store += code[i];
+        if (singleQuoteFlag||doubleQuoteFlag) { // checks if the present character is inside a string. If it is, it ignores all the rules.
+            store += code[i]; // and adds the character to the storage buffer
+            // The following code checks if the string has been ended
             if (singleQuoteFlag && code[i] === '\'' && code[i-1] !== '\\') {
                 if (store !== '') tokenStream.push(store);
                 store = '';
@@ -14,7 +17,8 @@ let lexer = (code) => {
                 store = '';
                 doubleQuoteFlag = false;
             }
-        } else {
+        } else { // if the present character is not inside string
+            // The first three conditions checks if any seperators (from opFirstChars) starts at i or not (length 3-1)
             if (opFirstChars.includes(code.substring(i, i+3))) {
                 if (store !== '') tokenStream.push(store);
                 store = '';
@@ -29,7 +33,7 @@ let lexer = (code) => {
                 if (store !== '') tokenStream.push(store);
                 store = '';
                 tokenStream.push(code.substring(i, i+1));
-            } else if (code[i] === '\''||code[i] === '\"') {
+            } else if (code[i] === '\''||code[i] === '\"') { // Checks if new string has been started
                 if (code[i] === '\'') {
                     singleQuoteFlag = true;
 
@@ -42,20 +46,14 @@ let lexer = (code) => {
                     store = "\"";
                 }
 
-            } else if (code[i] === ' ' || code[i] === ' ') {
+            } else if (code[i] === ' ' || code[i] === ' ') { // Checks for <space> or <tab> seperators
                 if (store !== '') tokenStream.push(store);
                 store = '';
-            } else {
+            } else { // if no conditions apply, the present character is added to the storage buffer
                 store += code[i];
             }
         }
     }
-    if (store !== '') tokenStream.push(store);
-    return tokenStream;
+    if (store !== '') tokenStream.push(store); // Cleans the storage buffer
+    return tokenStream; // Returns token array
 }
-
-console.log(lexer(
-    'attach "stdlib.kode"; person {constructer (age, name){ this.age = age; this.name = name; } addFriends (name) { this.friends.push(name); }} assign me = new person(15, "Mridutpal"); me.addFriends("Snehardra"); log me; assign a = 15 <=>this><"string"*2+ ++b;'
-    ).slice());
-
-// node src/lexer.js
