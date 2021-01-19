@@ -2,7 +2,7 @@
 let lexer = (code) => {
     var codeLength = code.length /* stores the code length for faster runtime.*/, store = ''/* stores characters and acts as a buffer */, doubleQuoteFlag = false, singleQuoteFlag = false /* Boolean flags to check if the present character is inside a string */, tokenStream = [];// Array to store the tokens
     // List containing all seperators
-    var opFirstChars = ['=','+','-','*','/','%','&','|','!','~','>','<',';',':',',','[',']','{','}','==','===','!=','!==','++','--','<<','>>','<=>','<=','>=','(',')','><'];
+    var opFirstChars = ['=','+','-','*','/','%','&','|','!','~','>','<',';',':',',','[',']','{','}','==','===','!=','!==','++','--','<<','>>','<=>','<=','>=','(',')','><','**'];
     // for loop running through the whole "code string"
     for (i = 0; i < codeLength; i++) {
         if (singleQuoteFlag||doubleQuoteFlag) { // checks if the present character is inside a string. If it is, it ignores all the rules.
@@ -46,7 +46,7 @@ let lexer = (code) => {
                     store = "\"";
                 }
 
-            } else if (code[i] === ' ' || code[i] === ' ') { // Checks for <space> or <tab> seperators
+            } else if (code[i] === ' ' || code[i] === ' ' || (code[i] === '/n')) { // Checks for <space> or <tab> or <newline> seperators
                 if (store !== '') tokenStream.push(store);
                 store = '';
             } else { // if no conditions apply, the present character is added to the storage buffer
