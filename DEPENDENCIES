@@ -1,0 +1,3 @@
+This JavaScript implementation of the Mkode Language has the following dependencies:
+1) UES (https://github.com/MkodeLang/UES)
+2) MKON (https://github.com/MkodeLang/MKON)
