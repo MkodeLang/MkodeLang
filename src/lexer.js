@@ -46,7 +46,7 @@ let lexer = (code) => {
                     store = "\"";
                 }
 
-            } else if (code[i] === ' ' || code[i] === ' ' || (code[i] === '/n')) { // Checks for <space> or <tab> or <newline> seperators
+            } else if (code[i].match(/\s/)) { // Checks for <space> or <tab> or <newline> seperators
                 if (store !== '') tokenStream.push(store);
                 store = '';
             } else { // if no conditions apply, the present character is added to the storage buffer
