@@ -1,7 +1,22 @@
 import Token from "./Token.js"
 import Error from "./Error.js"
 
-const keywords = ["while", "if", "else", "const", "assign", "getter", "setter", "undefined", "null", "return", "delete", "switch", "case", "attach"]
+const keywords = [
+  "while",
+  "if",
+  "else",
+  "const",
+  "assign",
+  "getter",
+  "setter",
+  "undefined",
+  "null",
+  "return",
+  "delete",
+  "switch",
+  "case",
+  "attach",
+]
 
 export default class Lexer {
   constructor(source) {
@@ -63,14 +78,29 @@ export default class Lexer {
       case "!":
         this.addToken(this.match("=") ? "BANG_EQUAL " : "BANG")
         break
+      case "%":
+        this.addToken("MODULUS")
+        break
       case "=":
-        this.addToken(this.match("=") ? "EQUAL_EQUAL" : "EQUAL")
+        this.addToken(
+          this.match("=")
+            ? "EQUAL_EQUAL"
+            : this.match(">")
+            ? "EQUAL_GREATER"
+            : "EQUAL"
+        )
         break
       case "<":
         this.addToken(this.match("=") ? "LESS_EQUAL" : "LESS")
         break
       case ">":
         this.addToken(this.match("=") ? "GREATER_EQUAL" : "GREATER")
+        break
+      case "&":
+        this.addToken(this.match("&") ? "AND_AND" : "AND")
+        break
+      case "|":
+        this.addToken(this.match("|") ? "OR_OR" : "OR")
         break
       case "#":
         while (this.peek() !== "\n" && !this.isAtEnd()) this.advance()
@@ -82,14 +112,12 @@ export default class Lexer {
       case "\n":
         this.newLine()
         break
-      case "\"":
+      case '"':
         this.string()
         break
       default:
-        if (this.isDigit(c))
-          this.number()
-        else if (this.isAlpha(c))
-          this.identifier()
+        if (this.isDigit(c)) this.number()
+        else if (this.isAlpha(c)) this.identifier()
         else {
           Error.panic(this.line, this.column, "Unexpected Character " + c)
           this.error = 1
@@ -98,9 +126,8 @@ export default class Lexer {
   }
 
   string() {
-    while (this.peek() !== "\"" && !this.isAtEnd()) {
-      if (this.peek() === "\n")
-        this.newLine()
+    while (this.peek() !== '"' && !this.isAtEnd()) {
+      if (this.peek() === "\n") this.newLine()
       this.advance()
     }
 
@@ -116,28 +143,26 @@ export default class Lexer {
   }
 
   number() {
-    while(this.isDigit(this.peek()))
-      this.advance()
+    while (this.isDigit(this.peek())) this.advance()
 
     if (this.peek() === "." && this.isDigit(this.peekNext())) {
       this.advance()
 
-      while (this.isDigit(this.peek()))
-        this.advance()
+      while (this.isDigit(this.peek())) this.advance()
     }
 
-    this.addToken("NUMBER", parseFloat(this.source.substring(this.start, this.current)))
+    this.addToken(
+      "NUMBER",
+      parseFloat(this.source.substring(this.start, this.current))
+    )
   }
 
   identifier() {
-    while (this.isAlphaNumeric(this.peek()))
-      this.advance()
+    while (this.isAlphaNumeric(this.peek())) this.advance()
 
     const text = this.source.substring(this.start, this.current)
-    if (keywords.includes(text))
-      this.addToken(text.toUpperCase())
-    else
-      this.addToken("IDENITFIER")
+    if (keywords.includes(text)) this.addToken(text.toUpperCase())
+    else this.addToken("IDENITFIER")
   }
 
   isAtEnd() {
@@ -169,8 +194,7 @@ export default class Lexer {
   }
 
   peekNext() {
-    if (this.current + 1 >= this.source.length)
-      return "\0"
+    if (this.current + 1 >= this.source.length) return "\0"
     return this.source[this.current + 1]
   }
 
@@ -182,13 +206,15 @@ export default class Lexer {
   }
 
   isDigit(char) {
-    return char >= '0' && char <= '9'
+    return char >= "0" && char <= "9"
   }
 
   isAlpha(char) {
-    return (char >= 'a' && char <= 'z') ||
-           (char >= 'A' && char <= 'Z') ||
-            char == '_'
+    return (
+      (char >= "a" && char <= "z") ||
+      (char >= "A" && char <= "Z") ||
+      char == "_"
+    )
   }
 
   isAlphaNumeric(char) {
