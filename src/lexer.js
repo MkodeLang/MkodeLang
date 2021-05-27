@@ -36,7 +36,7 @@ export default class Lexer {
     }
 
     this.tokens.push(new Token("EOF", "", null, this.line))
-    return /*this.error === 0 ?*/ this.tokens //: this.error
+    return this.error === 0 ? this.tokens : this.error
   }
 
   scanToken() {
