@@ -16,6 +16,8 @@ const keywords = [
   "switch",
   "case",
   "attach",
+  "true",
+  "false"
 ]
 
 export default class Lexer {
@@ -76,7 +78,7 @@ export default class Lexer {
         this.addToken("SLASH")
         break
       case "!":
-        this.addToken(this.match("=") ? "BANG_EQUAL " : "BANG")
+        this.addToken(this.match("=") ? "BANG_EQUAL" : "BANG")
         break
       case "%":
         this.addToken("MODULUS")
@@ -119,7 +121,7 @@ export default class Lexer {
         if (this.isDigit(c)) this.number()
         else if (this.isAlpha(c)) this.identifier()
         else {
-          Error.panic(this.line, this.column, "Unexpected Character " + c)
+          Error.error(this.line, this.column, "Unexpected Character " + c)
           this.error = 1
         }
     }
@@ -132,7 +134,7 @@ export default class Lexer {
     }
 
     if (this.isAtEnd()) {
-      Error.panic(this.line, this.column, "Unterminated string literal")
+      Error.error(this.line, this.column, "Unterminated string literal")
       return 1
     }
 
