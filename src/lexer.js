@@ -220,4 +220,27 @@ export default class Lexer {
   isAlphaNumeric(char) {
     return this.isDigit(char) || this.isAlpha(char)
   }
+
+  isEscape(char) {
+    if ("bfnrtv0'\"\\u".includes(char))
+      return true
+    return false
+  }
+
+  parseString(string) {
+    const length = string.length
+    let newString = ""
+    for (let i = 0; i < length; i++) {
+      if (string[i] === "\\") {
+        if (isEscape(string[i + 1])) {
+          i++
+          if ("\"\\'".includes(string[i])) {
+            newString += string[i]
+          }
+        }
+      } else {
+        newString += string[i]
+      }
+    }
+  }
 }
